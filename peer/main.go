@@ -73,6 +73,7 @@ var mainCmd = &cobra.Command{
 var versionFlag bool
 
 func main() {
+	logger.Info("=============== GM peer starting ========================")
 	// For environment variables.
 	viper.SetEnvPrefix(cmdRoot)
 	viper.AutomaticEnv()
@@ -108,6 +109,7 @@ func main() {
 	// Init the MSP
 	var mspMgrConfigDir = config.GetPath("peer.mspConfigPath")
 	var mspID = viper.GetString("peer.localMspId")
+
 	err = common.InitCrypto(mspMgrConfigDir, mspID)
 	if err != nil { // Handle errors reading the config file
 		logger.Errorf("Cannot run peer because %s", err.Error())
@@ -118,5 +120,4 @@ func main() {
 	if mainCmd.Execute() != nil {
 		os.Exit(1)
 	}
-	logger.Info("Exiting.....")
 }

@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/hyperledger/fabric/bccsp/factory"
+	"github.com/tjfoc/hyperledger-fabric-gm/bccsp/factory"
 	"github.com/hyperledger/fabric/common/configtx"
 	configtxapi "github.com/hyperledger/fabric/common/configtx/api"
 	"github.com/hyperledger/fabric/common/errors"
@@ -101,6 +101,9 @@ func InitCrypto(mspMgrConfigDir string, localMSPID string) error {
 		return fmt.Errorf("could not parse YAML config [%s]", err)
 	}
 
+	// bccspConfig = factory.GetDefaultOpts()
+	// if bccspConfig != nil {
+	// }
 	err = mspmgmt.LoadLocalMsp(mspMgrConfigDir, bccspConfig, localMSPID)
 	if err != nil {
 		return fmt.Errorf("error when setting up MSP from directory %s: err %s", mspMgrConfigDir, err)

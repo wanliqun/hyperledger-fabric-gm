@@ -12,6 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+Modified create GM options by Tongji Fintech Research Institute on 2017-09-15.
 */
 package csp
 
@@ -20,9 +21,10 @@ import (
 	"crypto/ecdsa"
 	"crypto/x509"
 
-	"github.com/hyperledger/fabric/bccsp"
-	"github.com/hyperledger/fabric/bccsp/factory"
-	"github.com/hyperledger/fabric/bccsp/signer"
+	"github.com/tjfoc/hyperledger-fabric-gm/bccsp"
+	"github.com/tjfoc/hyperledger-fabric-gm/bccsp/factory"
+	"github.com/tjfoc/hyperledger-fabric-gm/bccsp/signer"
+	"github.com/tjfoc/gmsm/sm2"
 )
 
 // GeneratePrivateKey creates a private key and stores it in keystorePath
@@ -34,9 +36,11 @@ func GeneratePrivateKey(keystorePath string) (bccsp.Key,
 	var s crypto.Signer
 
 	opts := &factory.FactoryOpts{
-		ProviderName: "SW",
+		//ProviderName: "SW",
+		ProviderName: "GM",
 		SwOpts: &factory.SwOpts{
-			HashFamily: "SHA2",
+			//HashFamily: "SHA2",
+			HashFamily: "GMSM3",
 			SecLevel:   256,
 
 			FileKeystore: &factory.FileKeystoreOpts{
@@ -47,7 +51,8 @@ func GeneratePrivateKey(keystorePath string) (bccsp.Key,
 	csp, err := factory.GetBCCSPFromOpts(opts)
 	if err == nil {
 		// generate a key
-		priv, err = csp.KeyGen(&bccsp.ECDSAP256KeyGenOpts{Temporary: false})
+		//priv, err = csp.KeyGen(&bccsp.ECDSAP256KeyGenOpts{Temporary: false})
+		priv, err = csp.KeyGen(&bccsp.GMSM2KeyGenOpts{Temporary: false})
 		if err == nil {
 			// create a crypto.Signer
 			s, err = signer.New(csp, priv)
@@ -74,4 +79,26 @@ func GetECPublicKey(priv bccsp.Key) (*ecdsa.PublicKey, error) {
 		return nil, err
 	}
 	return ecPubKey.(*ecdsa.PublicKey), nil
+}
+
+func GetSM2PublicKey(priv bccsp.Key) (*sm2.PublicKey, error) {
+
+	// get the public key
+	pubKey, err := priv.PublicKey()
+	if err != nil {
+		return nil, err
+	}
+
+	// marshal to bytes
+	pubKeyBytes, err := pubKey.Bytes()
+	if err != nil {
+		return nil, err
+	}
+	// unmarshal using pkix
+	sm2PubKey, err := sm2.ParseSm2PublicKey(pubKeyBytes)
+	//ecPubKey, err := x509.ParsePKIXPublicKey(pubKeyBytes)
+	if err != nil {
+		return nil, err
+	}
+	return sm2PubKey, nil
 }

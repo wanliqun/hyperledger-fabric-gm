@@ -25,7 +25,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/hyperledger/fabric/bccsp/factory"
+	"github.com/tjfoc/hyperledger-fabric-gm/bccsp/factory"
 	"github.com/hyperledger/fabric/common/config"
 	mspconfig "github.com/hyperledger/fabric/common/config/msp"
 	"github.com/hyperledger/fabric/common/configtx"
@@ -42,11 +42,12 @@ import (
 )
 
 var exitCode = 0
-
 var logger = flogging.MustGetLogger("common/configtx/tool")
 
 func doOutputBlock(config *genesisconfig.Profile, channelID string, outputBlock string) error {
+
 	pgen := provisional.New(config)
+
 	logger.Info("Generating genesis block")
 	if config.Orderer == nil {
 		return fmt.Errorf("config does not contain an Orderers section, necessary for all config blocks, aborting")
@@ -74,7 +75,7 @@ func doOutputChannelCreateTx(conf *genesisconfig.Profile, channelID string, outp
 		return fmt.Errorf("Cannot define a new channel with no Consortium value")
 	}
 
-	// XXX we ignore the non-application org names here, once the tool supports configuration updates
+	// we ignore the non-application org names here, once the tool supports configuration updates
 	// we should come up with a cleaner way to handle this, but leaving as is for the moment to not break
 	// backwards compatibility
 	var orgNames []string
